@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name='cgroup-monitor',
-    version='0.1.0',
+    version='0.1.1',
     url='https://github.com/veedata/cgroup-monitor',
     download_url='https://github.com/veedata/cgroup-monitor/archive/refs/tags/v1.0.1-stable.tar.gz',
     author='Viraj Thakkar',
