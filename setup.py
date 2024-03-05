@@ -30,7 +30,7 @@ setuptools.setup(
         'Programming Language :: Python :: 3.9',
         'Programming Language :: Python :: 3.10',
     ],
-    package_dir={"": "cgroup-monitor"},
-    packages=setuptools.find_packages(where="cgroup-monitor"),
+    package_dir={"": "cgroup_monitor"},
+    packages=setuptools.find_packages(where="cgroup_monitor"),
     test_suite='tests',
 )
