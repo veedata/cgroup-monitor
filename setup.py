@@ -5,9 +5,9 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name='cgroup-monitor',
-    version='0.1.1',
+    version='0.1.2',
     url='https://github.com/veedata/cgroup-monitor',
-    download_url='https://github.com/veedata/cgroup-monitor/archive/refs/tags/v1.0.1-stable.tar.gz',
+    download_url='https://github.com/veedata/cgroup-monitor/archive/refs/tags/v0.1.2-stable.tar.gz',
     author='Viraj Thakkar',
     author_email='vdthakkar111@gmail.com',
     description='A simple library to monitor CPU and Memory usage only using cgroups. Mainly created to monitor the resources inside the container.',
@@ -31,7 +31,7 @@ setuptools.setup(
         'Programming Language :: Python :: 3.10',
         'Programming Language :: Python :: 3.11',
     ],
-    package_dir={"": "cgroup_monitor"},
-    packages=setuptools.find_packages(where="cgroup_monitor"),
+    packages=['cgroup_monitor'],
+    include_package_data=True,
     test_suite='tests',
 )
