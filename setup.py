@@ -19,12 +19,6 @@ setuptools.setup(
         "Issue tracker": "https://github.com/veedata/cgroup-monitor/issues",
         'Documentation': "https://cgroup-monitor.readthedocs.io/en/latest",
     },
-    install_requires=[
-        'requests',
-        'piexif',
-        'opencv-python',
-        'Pillow',
-    ],
     classifiers=[
         'Operating System :: OS Independent',
         'Development Status :: 5 - Production/Stable',
