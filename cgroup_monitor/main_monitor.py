@@ -172,6 +172,7 @@ class CGroupMonitor(threading.Thread):
             # If time is greater than 1 second, print
             if (time.time_ns() - self.monitor_start_time) > 1000000000:
                 self.monitor_start_time = time.time_ns()
-                self.cpu_usage_percent_list.append(self.get_cpu_usage_percent())
+                self.cpu_usage_percent_list.append(
+                    self.get_cpu_usage_percent())
                 self.memory_usage_percent_list.append(
                     self.get_memory_usage_percent())
