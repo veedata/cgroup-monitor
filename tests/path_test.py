@@ -3,6 +3,7 @@ import time
 
 from cgroup_monitor import CGroupMonitor
 
+
 class TestCGroupMonitor(unittest.TestCase):
 
     def test_monitor(self):
@@ -17,4 +18,4 @@ class TestCGroupMonitor(unittest.TestCase):
         else:
             print("No CPU Usage Percent List")
 
-        assert(len(cpu_usage_percent_list) > 0)
+        assert (len(cpu_usage_percent_list) > 0)
