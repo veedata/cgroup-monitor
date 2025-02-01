@@ -22,8 +22,4 @@ python =
 [testenv]
 commands = python -m unittest discover
 deps = .[test]
-
-[testenv:flake8]
-commands = flake8 {posargs} cgroup_monitor/
-deps = flake8
 """
