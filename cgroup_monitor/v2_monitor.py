@@ -5,6 +5,16 @@ import threading
 
 class CGroupMonitor:
     def __init__(self, cgroup_name="", cgroup_base_path="/sys/fs/cgroup"):
+        '''
+        Initialize the CGroupMonitor object.
+
+        Parameters:
+        - cgroup_name (str): Name of the cgroup. Default is an empty string.
+        - cgroup_base_path (str): Base path of the cgroup. Default is /sys/fs/cgroup.
+
+        Returns:
+        - None
+        '''
         self.cgroup_name = cgroup_name
         self.cgroup_base_path = cgroup_base_path
         self.cgroup_path = os.path.join(cgroup_base_path, cgroup_name)
@@ -15,65 +25,113 @@ class CGroupMonitor:
         self.monitor_thread = None
         self.start_time = None
 
-    def get_cpu_usage_us(self):
-        """Get the cumulative CPU usage in microseconds."""
-        cpu_stat_path = os.path.join(self.cgroup_path, "cpu.stat")
+    def _read_file(self, path):
+        '''
+        Internal method to read the contents of a file.
+
+        Parameters:
+        - path (str): Path to the file.
+
+        Returns:
+        - content (str): Content of the file.
+        '''
         try:
-            with open(cpu_stat_path, "r") as f:
-                for line in f:
-                    if line.startswith("usage_usec"):
-                        usage_usec = int(line.split()[1])
-                        return usage_usec
+            with open(path, "r") as f:
+                return f.read().strip()
         except FileNotFoundError:
-            pass
+            return None
+
+    def get_cpu_usage_us(self):
+        '''
+        Get the cumulative CPU usage in microseconds.
+
+        Parameters:
+        - None
+
+        Returns:
+        - usage_usec (int): CPU usage in microseconds.
+        '''
+        cpu_stat_path = os.path.join(self.cgroup_path, "cpu.stat")
+        content = self._read_file(cpu_stat_path)
+        if content:
+            for line in content.splitlines():
+                if line.startswith("usage_usec"):
+                    return int(line.split()[1])
         return 0
 
     def get_cpu_limit(self):
-        """Get the CPU quota and period."""
+        '''
+        Get the CPU quota and period.
+
+        Parameters:
+        - None
+
+        Returns:
+        - quota (int or None): CPU quota.
+        - period (int): CPU period in microseconds.
+        '''
         cpu_max_path = os.path.join(self.cgroup_path, "cpu.max")
-        try:
-            with open(cpu_max_path, "r") as f:
-                data = f.read().strip().split()
-                if data[0] == "max":
-                    return None, int(data[1])
-                else:
-                    return int(data[0]), int(data[1])
-        except FileNotFoundError:
-            pass
+        content = self._read_file(cpu_max_path)
+        if content:
+            data = content.split()
+            if data[0] == "max":
+                return None, int(data[1])
+            else:
+                return int(data[0]), int(data[1])
         return None, 100000  # Default period if not specified
 
     def get_memory_usage(self):
-        """Get the current memory usage in bytes."""
+        '''
+        Get the current memory usage in bytes.
+
+        Parameters:
+        - None
+
+        Returns:
+        - memory_usage (int): Memory usage in bytes.
+        '''
         memory_current_path = os.path.join(self.cgroup_path, "memory.current")
-        try:
-            with open(memory_current_path, "r") as f:
-                return int(f.read().strip())
-        except FileNotFoundError:
-            pass
-        return 0
+        content = self._read_file(memory_current_path)
+        return int(content) if content else 0
 
     def get_memory_limit(self):
-        """Get the memory limit in bytes."""
+        '''
+        Get the memory limit in bytes.
+
+        Parameters:
+        - None
+
+        Returns:
+        - memory_limit (int): Memory limit in bytes.
+        '''
         memory_max_path = os.path.join(self.cgroup_path, "memory.max")
-        try:
-            with open(memory_max_path, "r") as f:
-                return int(f.read().strip())
-        except FileNotFoundError:
-            pass
-        return 0
+        content = self._read_file(memory_max_path)
+        return int(content) if content else 0
 
     def get_swap_limit(self):
-        """Get the swap limit in bytes."""
+        '''
+        Get the swap limit in bytes.
+
+        Parameters:
+        - None
+
+        Returns:
+        - swap_limit (int): Swap limit in bytes.
+        '''
         swap_max_path = os.path.join(self.cgroup_path, "memory.swap.max")
-        try:
-            with open(swap_max_path, "r") as f:
-                return int(f.read().strip())
-        except FileNotFoundError:
-            pass
-        return
+        content = self._read_file(swap_max_path)
+        return int(content) if content else 0
 
     def _monitor(self, interval):
-        """Internal method to monitor CPU and memory usage."""
+        '''
+        Internal method to monitor CPU and memory usage.
+
+        Parameters:
+        - interval (int): Monitoring interval in seconds.
+
+        Returns:
+        - None
+        '''
         previous_cpu_usage = self.get_cpu_usage_us()
         while self.monitoring:
             time.sleep(interval)
@@ -86,15 +144,22 @@ class CGroupMonitor:
             quota, period = self.get_cpu_limit()
             num_cores = quota / period if quota else os.cpu_count()
             total_cpu_time_available = num_cores * (interval * 1000000)
-            cpu_usage_percentage = (delta_cpu_usage /
-                                    total_cpu_time_available) * 100
+            cpu_usage_percentage = (delta_cpu_usage / total_cpu_time_available) * 100
 
             # Store results
             self.cpu_usage_percentages.append(cpu_usage_percentage)
             self.memory_usage.append(self.get_memory_usage())
 
     def start_monitor(self, interval=1):
-        """Start monitoring CPU and memory usage."""
+        '''
+        Start monitoring CPU and memory usage.
+
+        Parameters:
+        - interval (int): Monitoring interval in seconds. Default is 1 second.
+
+        Returns:
+        - None
+        '''
         if self.monitoring:
             raise RuntimeError("Monitoring is already running.")
 
@@ -108,32 +173,38 @@ class CGroupMonitor:
         self.monitor_thread.start()
 
     def get_last_n_stats(self, n=1):
-        """Get the last n stats recorded.
-        Returns same format as stop_monitoring."""
+        '''
+        Get the last n stats recorded.
+
+        Parameters:
+        - n (int): Number of stats to retrieve. Default is 1.
+
+        Returns:
+        - stats (dict): Dictionary containing average and max usage stats.
+        '''
         if not self.monitoring:
             raise RuntimeError("Monitoring is not running.")
 
         avg_cpu = (
             sum(self.cpu_usage_percentages[-n:]) / n
-            if self.cpu_usage_percentages
-            else 0
+            if self.cpu_usage_percentages else 0
         )
-        avg_memory = (sum(self.memory_usage[-n:]) / n
-                      if self.memory_usage else 0)
-        avg_memory_gb = avg_memory / (1024 * 1024 * 1024)
+        avg_memory = (
+            sum(self.memory_usage[-n:]) / n
+            if self.memory_usage else 0
+        )
+        avg_memory_gb = avg_memory / (1024 ** 3)
         avg_memory_percent = (
             (avg_memory / self.get_memory_limit()) * 100
-            if self.get_memory_limit()
-            else 0
+            if self.get_memory_limit() else 0
         )
 
         max_cpu = max(self.cpu_usage_percentages[-n:], default=0)
         max_memory = max(self.memory_usage[-n:], default=0)
-        max_memory_gb = max_memory / (1024 * 1024 * 1024)
+        max_memory_gb = max_memory / (1024 ** 3)
         max_memory_percent = (
             (max_memory / self.get_memory_limit()) * 100
-            if self.get_memory_limit()
-            else 0
+            if self.get_memory_limit() else 0
         )
 
         return {
@@ -146,7 +217,28 @@ class CGroupMonitor:
         }
 
     def stop_monitor(self):
-        """Stop monitoring and return average and max usage stats."""
+        '''
+        Stop monitoring and return average and max usage stats.
+        ```
+        Returns:
+            dict = {
+                "average_cpu_usage_percent": float,
+                "average_memory_usage_gib": float,
+                "average_memory_usage_percent": float,
+                "max_cpu_usage_percent": float,
+                "max_memory_usage_gib": float,
+                "max_memory_usage_percent": float,
+                "monitoring_duration_s": float
+            }
+        ```
+
+        Parameters:
+        - None
+
+        Returns:
+        - stats (dict): Dictionary containing average and max usage stats.
+
+        '''
         if not self.monitoring:
             raise RuntimeError("Monitoring is not running.")
 
@@ -157,27 +249,24 @@ class CGroupMonitor:
 
         avg_cpu = (
             sum(self.cpu_usage_percentages) / len(self.cpu_usage_percentages)
-            if self.cpu_usage_percentages
-            else 0
+            if self.cpu_usage_percentages else 0
         )
         avg_memory = (
             sum(self.memory_usage) / len(self.memory_usage)
             if self.memory_usage else 0
         )
-        avg_memory_gb = avg_memory / (1024 * 1024 * 1024)
+        avg_memory_gb = avg_memory / (1024 ** 3)
         avg_memory_percent = (
             (avg_memory / self.get_memory_limit()) * 100
-            if self.get_memory_limit()
-            else 0
+            if self.get_memory_limit() else 0
         )
 
         max_cpu = max(self.cpu_usage_percentages, default=0)
         max_memory = max(self.memory_usage, default=0)
-        max_memory_gb = max_memory / (1024 * 1024 * 1024)
+        max_memory_gb = max_memory / (1024 ** 3)
         max_memory_percent = (
             (max_memory / self.get_memory_limit()) * 100
-            if self.get_memory_limit()
-            else 0
+            if self.get_memory_limit() else 0
         )
 
         return {
