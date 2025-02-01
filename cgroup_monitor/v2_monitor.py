@@ -86,7 +86,8 @@ class CGroupMonitor:
             quota, period = self.get_cpu_limit()
             num_cores = quota / period if quota else os.cpu_count()
             total_cpu_time_available = num_cores * (interval * 1000000)
-            cpu_usage_percentage = (delta_cpu_usage / total_cpu_time_available) * 100
+            cpu_usage_percentage = (delta_cpu_usage /
+                                    total_cpu_time_available) * 100
 
             # Store results
             self.cpu_usage_percentages.append(cpu_usage_percentage)
@@ -107,7 +108,7 @@ class CGroupMonitor:
         self.monitor_thread.start()
 
     def get_last_n_stats(self, n=1):
-        """Get the last n stats recorded. 
+        """Get the last n stats recorded.
         Returns same format as stop_monitoring."""
         if not self.monitoring:
             raise RuntimeError("Monitoring is not running.")
@@ -117,7 +118,8 @@ class CGroupMonitor:
             if self.cpu_usage_percentages
             else 0
         )
-        avg_memory = sum(self.memory_usage[-n:]) / n if self.memory_usage else 0
+        avg_memory = (sum(self.memory_usage[-n:]) / n
+                      if self.memory_usage else 0)
         avg_memory_gb = avg_memory / (1024 * 1024 * 1024)
         avg_memory_percent = (
             (avg_memory / self.get_memory_limit()) * 100

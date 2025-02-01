@@ -1,7 +1,9 @@
 import os
 
+
 def is_cgroup_v2():
     return os.path.exists("/sys/fs/cgroup/cgroup.controllers")
+
 
 if is_cgroup_v2():
     from .v2_monitor import CGroupMonitor
