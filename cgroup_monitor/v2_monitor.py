@@ -61,7 +61,7 @@ class CGroupMonitor:
         except FileNotFoundError:
             pass
         return 0
-    
+
     def get_swap_limit(self):
         """Get the swap limit in bytes."""
         swap_max_path = os.path.join(self.cgroup_path, "memory.swap.max")
@@ -101,23 +101,38 @@ class CGroupMonitor:
         self.cpu_usage_percentages = []
         self.memory_usage = []
         self.start_time = time.time()
-        self.monitor_thread = threading.Thread(target=self._monitor, args=(interval,), daemon=True)
+        self.monitor_thread = threading.Thread(
+            target=self._monitor, args=(interval,), daemon=True
+        )
         self.monitor_thread.start()
 
     def get_last_n_stats(self, n=1):
-        """Get the last n stats recorded. Returns same format as stop_monitoring."""
+        """Get the last n stats recorded. 
+        Returns same format as stop_monitoring."""
         if not self.monitoring:
             raise RuntimeError("Monitoring is not running.")
-        
-        avg_cpu = sum(self.cpu_usage_percentages[-n:]) / n if self.cpu_usage_percentages else 0
+
+        avg_cpu = (
+            sum(self.cpu_usage_percentages[-n:]) / n
+            if self.cpu_usage_percentages
+            else 0
+        )
         avg_memory = sum(self.memory_usage[-n:]) / n if self.memory_usage else 0
         avg_memory_gb = avg_memory / (1024 * 1024 * 1024)
-        avg_memory_percent = (avg_memory / self.get_memory_limit()) * 100 if self.get_memory_limit() else 0
+        avg_memory_percent = (
+            (avg_memory / self.get_memory_limit()) * 100
+            if self.get_memory_limit()
+            else 0
+        )
 
         max_cpu = max(self.cpu_usage_percentages[-n:], default=0)
         max_memory = max(self.memory_usage[-n:], default=0)
         max_memory_gb = max_memory / (1024 * 1024 * 1024)
-        max_memory_percent = (max_memory / self.get_memory_limit()) * 100 if self.get_memory_limit() else 0
+        max_memory_percent = (
+            (max_memory / self.get_memory_limit()) * 100
+            if self.get_memory_limit()
+            else 0
+        )
 
         return {
             "average_cpu_usage_percent": round(avg_cpu, 2),
@@ -125,7 +140,7 @@ class CGroupMonitor:
             "average_memory_usage_percent": round(avg_memory_percent, 2),
             "max_cpu_usage_percent": round(max_cpu, 2),
             "max_memory_usage_gib": round(max_memory_gb, 2),
-            "max_memory_usage_percent": round(max_memory_percent, 2)
+            "max_memory_usage_percent": round(max_memory_percent, 2),
         }
 
     def stop_monitor(self):
@@ -138,15 +153,30 @@ class CGroupMonitor:
         self.monitor_thread = None
         total_time = time.time() - self.start_time
 
-        avg_cpu = sum(self.cpu_usage_percentages) / len(self.cpu_usage_percentages) if self.cpu_usage_percentages else 0
-        avg_memory = sum(self.memory_usage) / len(self.memory_usage) if self.memory_usage else 0
+        avg_cpu = (
+            sum(self.cpu_usage_percentages) / len(self.cpu_usage_percentages)
+            if self.cpu_usage_percentages
+            else 0
+        )
+        avg_memory = (
+            sum(self.memory_usage) / len(self.memory_usage)
+            if self.memory_usage else 0
+        )
         avg_memory_gb = avg_memory / (1024 * 1024 * 1024)
-        avg_memory_percent = (avg_memory / self.get_memory_limit()) * 100 if self.get_memory_limit() else 0
+        avg_memory_percent = (
+            (avg_memory / self.get_memory_limit()) * 100
+            if self.get_memory_limit()
+            else 0
+        )
 
         max_cpu = max(self.cpu_usage_percentages, default=0)
         max_memory = max(self.memory_usage, default=0)
         max_memory_gb = max_memory / (1024 * 1024 * 1024)
-        max_memory_percent = (max_memory / self.get_memory_limit()) * 100 if self.get_memory_limit() else 0
+        max_memory_percent = (
+            (max_memory / self.get_memory_limit()) * 100
+            if self.get_memory_limit()
+            else 0
+        )
 
         return {
             "average_cpu_usage_percent": round(avg_cpu, 2),
@@ -155,5 +185,5 @@ class CGroupMonitor:
             "max_cpu_usage_percent": round(max_cpu, 2),
             "max_memory_usage_gib": round(max_memory_gb, 2),
             "monitoring_duration_s": round(total_time, 2),
-            "max_memory_usage_percent": round(max_memory_percent, 2)
+            "max_memory_usage_percent": round(max_memory_percent, 2),
         }
