@@ -4,7 +4,7 @@ import threading
 
 
 class CGroupMonitor:
-    def __init__(self, cgroup_name, cgroup_base_path="/sys/fs/cgroup"):
+    def __init__(self, cgroup_name="", cgroup_base_path="/sys/fs/cgroup"):
         self.cgroup_name = cgroup_name
         self.cgroup_base_path = cgroup_base_path
         self.cgroup_path = os.path.join(cgroup_base_path, cgroup_name)
