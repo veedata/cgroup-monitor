@@ -19,8 +19,8 @@ sys.path.insert(0, os.path.abspath('..'))
 project = 'cgroup-monitor'
 copyright = '2025, Viraj Thakkar'
 author = 'Viraj Thakkar'
-version = '0.2.0'
-release = 'v0.2.0'
+version = '1.0.0'
+release = 'v1.0.0'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
