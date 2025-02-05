@@ -75,8 +75,8 @@ class CGroupManager:
             else:
                 proc = subprocess.run(["sudo", self.helper_script, "create", self.cgroup_path], check=True)
 
-            if proc.returncode != 0:
-                raise Exception(f"Failed to create cgroup with command: {proc.args}")
+                if proc.returncode != 0:
+                    raise Exception(f"Failed to create cgroup with command: {proc.args}")
 
         # Take ownership of the cgroup
         if self.helper_script is None:

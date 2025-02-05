@@ -110,13 +110,13 @@ class CGroupMonitor:
 
     def get_swap_limit(self):
         '''
-        Get the swap limit in bytes.
+        Get the memory+swap limit in bytes.
 
         Parameters:
         - None
 
         Returns:
-        - swap_limit (int): Swap limit in bytes.
+        - memory_swap_limit (int): Memory+Swap limit in bytes.
         '''
         swap_max_path = os.path.join(self.cgroup_path, "memory.swap.max")
         content = self._read_file(swap_max_path)
@@ -255,7 +255,6 @@ class CGroupMonitor:
 
         Returns:
         - stats (dict): Dictionary containing average and max usage stats.
-
         '''
         if not self.monitoring:
             raise RuntimeError("Monitoring is not running.")
