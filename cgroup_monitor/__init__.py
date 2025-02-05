@@ -13,4 +13,4 @@ else:
     from .v1_manager import CGroupManager
 
 __version__ = "1.0.0"
-__all__ = ["CGroupMonitor"]
+__all__ = ["CGroupMonitor", "CGroupManager"]
