@@ -150,12 +150,13 @@ class CGroupMonitor:
             self.cpu_usage_percentages.append(cpu_usage_percentage)
             self.memory_usage.append(self.get_memory_usage())
 
-    def start_monitor(self, interval=1):
+    def start_monitor(self, interval=1.0):
         '''
         Start monitoring CPU and memory usage.
 
         Parameters:
-        - interval (int): Monitoring interval in seconds. Default is 1 second.
+        - interval (float): Monitoring interval in seconds. Default is 1 second.
+            Uses time.sleep() and can be float value for higher precision.
 
         Returns:
         - None
@@ -172,12 +173,15 @@ class CGroupMonitor:
         )
         self.monitor_thread.start()
 
-    def get_last_n_stats(self, n=1):
+    def get_last_n_stats(self, n=1, info_level=0):
         '''
         Get the last n stats recorded.
 
         Parameters:
         - n (int): Number of stats to retrieve. Default is 1.
+        - info_level (int): Level of information to return. Default is 0.
+            - 0: Return average and max usage stats.
+            - 1: Return detailed stats including all recorded values.
 
         Returns:
         - stats (dict): Dictionary containing average and max usage stats.
@@ -207,33 +211,47 @@ class CGroupMonitor:
             if self.get_memory_limit() else 0
         )
 
+        if info_level == 1:
+            return {
+                "average_cpu_usage_percent": round(avg_cpu, 2),
+                "max_cpu_usage_percent": round(max_cpu, 2),
+                "cpu_usage_percentage_list": self.cpu_usage_percentages[-n:],
+                "average_memory_usage_gib": round(avg_memory_gb, 2),
+                "max_memory_usage_gib": round(max_memory_gb, 2),
+                "average_memory_usage_percent": round(avg_memory_percent, 2),
+                "max_memory_usage_percent": round(max_memory_percent, 2),
+                "memory_usage_bytes_list": self.memory_usage[-n:],
+            }
+        
         return {
             "average_cpu_usage_percent": round(avg_cpu, 2),
-            "average_memory_usage_gib": round(avg_memory_gb, 2),
-            "average_memory_usage_percent": round(avg_memory_percent, 2),
             "max_cpu_usage_percent": round(max_cpu, 2),
+            "average_memory_usage_gib": round(avg_memory_gb, 2),
             "max_memory_usage_gib": round(max_memory_gb, 2),
+            "average_memory_usage_percent": round(avg_memory_percent, 2),
             "max_memory_usage_percent": round(max_memory_percent, 2),
         }
 
-    def stop_monitor(self):
+    def stop_monitor(self, info_level=0):
         '''
         Stop monitoring and return average and max usage stats.
         ```
         Returns:
             dict = {
                 "average_cpu_usage_percent": float,
-                "average_memory_usage_gib": float,
-                "average_memory_usage_percent": float,
                 "max_cpu_usage_percent": float,
+                "average_memory_usage_gib": float,
                 "max_memory_usage_gib": float,
+                "average_memory_usage_percent": float,
                 "max_memory_usage_percent": float,
                 "monitoring_duration_s": float
             }
         ```
 
         Parameters:
-        - None
+        - info_level (int): Level of information to return. Default is 0.
+            - 0: Return average and max usage stats.
+            - 1: Return detailed stats including all recorded values.
 
         Returns:
         - stats (dict): Dictionary containing average and max usage stats.
@@ -269,12 +287,26 @@ class CGroupMonitor:
             if self.get_memory_limit() else 0
         )
 
+        if info_level == 1:
+            return {
+                "average_cpu_usage_percent": round(avg_cpu, 2),
+                "max_cpu_usage_percent": round(max_cpu, 2),
+                "cpu_usage_percentage_list": self.cpu_usage_percentages,
+                "average_memory_usage_gib": round(avg_memory_gb, 2),
+                "max_memory_usage_gib": round(max_memory_gb, 2),
+                "average_memory_usage_percent": round(avg_memory_percent, 2),
+                "max_memory_usage_percent": round(max_memory_percent, 2),
+                "memory_usage_bytes_list": self.memory_usage,
+                "start_time": self.start_time,
+                "monitoring_duration_s": round(total_time, 2),
+            }
+
         return {
             "average_cpu_usage_percent": round(avg_cpu, 2),
-            "average_memory_usage_gib": round(avg_memory_gb, 2),
-            "average_memory_usage_percent": round(avg_memory_percent, 2),
             "max_cpu_usage_percent": round(max_cpu, 2),
+            "average_memory_usage_gib": round(avg_memory_gb, 2),
             "max_memory_usage_gib": round(max_memory_gb, 2),
-            "monitoring_duration_s": round(total_time, 2),
+            "average_memory_usage_percent": round(avg_memory_percent, 2),
             "max_memory_usage_percent": round(max_memory_percent, 2),
+            "monitoring_duration_s": round(total_time, 2),
         }
