@@ -128,6 +128,7 @@ class CGroupManager:
     def set_memory_swap_limit(self, limit, sudo=False):
         '''
         Set the memory+swap limit in bytes.
+        Note: This sets maximum amount for the sum of memory and swap usage both.
 
         Parameters:
         - limit (int): Memory+swap limit in bytes.

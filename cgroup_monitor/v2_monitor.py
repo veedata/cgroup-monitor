@@ -222,7 +222,7 @@ class CGroupMonitor:
                 "max_memory_usage_percent": round(max_memory_percent, 2),
                 "memory_usage_bytes_list": self.memory_usage[-n:],
             }
-        
+
         return {
             "average_cpu_usage_percent": round(avg_cpu, 2),
             "max_cpu_usage_percent": round(max_cpu, 2),
