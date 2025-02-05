@@ -80,7 +80,7 @@ class CGroupManager:
 
         # Take ownership of the cgroup
         if self.helper_script is None:
-            proc = subprocess.run(["sudo", "chown", f"{os.getuid()}:{os.getgid()}", self.cgroup_path], check=True)
+            proc = subprocess.run(["sudo", "chown", "-R", f"{os.getuid()}:{os.getgid()}", self.cgroup_path], check=True)
         else:
             proc = subprocess.run(["sudo", self.helper_script, "chown", self.cgroup_path], check=True)
 
