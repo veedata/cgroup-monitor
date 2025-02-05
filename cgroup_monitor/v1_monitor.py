@@ -138,7 +138,7 @@ class CGroupMonitor:
             prev_cpu_usage = current_cpu_usage
 
             quota, period = self.get_cpu_limit()
-            num_cores = quota / period if quota else os.cpu_count()
+            num_cores = quota / period if quota > 0 else os.cpu_count()
             total_cpu_time_available = num_cores * (interval * 1e9)
             cpu_usage_percent = (delta / total_cpu_time_available) * 100
 
