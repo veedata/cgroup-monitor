@@ -36,6 +36,7 @@ extensions = [
     'sphinx.ext.githubpages',
     'sphinx.ext.napoleon',
     'sphinx.ext.todo',
+    'sphinx_rtd_theme',
 ]
 
 # Napoleon settings
